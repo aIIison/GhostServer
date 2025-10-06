@@ -247,9 +247,6 @@ void NetworkManager::StartCountdown(const std::string preCommands, const std::st
 
 bool NetworkManager::ShouldBlockConnection(const sf::IpAddress& ip)
 {
-    if (std::find_if(this->clients.begin(), this->clients.end(), [&ip](const Client& c) { return ip == c.IP; }) != this->clients.end()) {
-        return true;
-    }
 
     for (auto banned : this->bannedIps) {
         if (ip == banned) return true;
@@ -455,6 +452,10 @@ void NetworkManager::Treat(sf::Packet& packet, sf::IpAddress ip, unsigned short 
         DataGhost data;
         packet >> data;
         client->data = data;
+        break;
+    }
+    case HEADER::VOICE: {
+        SEND_TO_OTHERS(packet);
         break;
     }
     default:
